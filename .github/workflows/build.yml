@@ -39,8 +39,10 @@ jobs:
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/ishara.keystore"
+          CLEAN=$(printf '%s' "$KEYSTORE_B64" | tr -d ' \n\r\t')
+          echo "Secret length: ${#CLEAN} (expected 3488)"
+          if [ -n "$CLEAN" ]; then
+            printf '%s' "$CLEAN" | base64 -d > "$RUNNER_TEMP/ishara.keystore"
             echo "KEYSTORE_FILE=$RUNNER_TEMP/ishara.keystore" >> "$GITHUB_ENV"
           else
             echo "No KEYSTORE_BASE64 secret - using default debug signing"
