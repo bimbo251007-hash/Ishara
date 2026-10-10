@@ -87,3 +87,43 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  build-windows:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unzip project
+        shell: pwsh
+        run: Expand-Archive -Path Ishara_Android_Project.zip -DestinationPath . -Force
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Prepare desktop app
+        shell: bash
+        run: |
+          DIR="${{ needs.build.outputs.dir }}"
+          mkdir -p desktop-build/app
+          cp -r "$DIR/app/src/main/assets/." desktop-build/app/
+          cp "$DIR/desktop/package.json" "$DIR/desktop/main.js" desktop-build/
+          cp "$DIR/app/src/main/res/drawable/ishara_icon.png" desktop-build/icon.png
+
+      - name: Build Windows installer
+        shell: bash
+        working-directory: desktop-build
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: |
+          npm install --no-audit --no-fund
+          npx electron-builder --win --publish never
+
+      - name: Publish Windows files
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          files: |
+            desktop-build/dist/Ishara-Setup.exe
+            desktop-build/dist/Ishara-Portable.exe
