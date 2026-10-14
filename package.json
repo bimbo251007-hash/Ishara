@@ -1,0 +1,29 @@
+{
+  "name": "ishara",
+  "version": "1.0.0",
+  "description": "Ishara - Sign language learning",
+  "main": "main.js",
+  "author": "Ishara",
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.ishara.desktop",
+    "productName": "Ishara",
+    "directories": { "buildResources": "." },
+    "files": ["main.js", "app/**/*"],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Ishara-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "Ishara-Portable.${ext}"
+    }
+  }
+}

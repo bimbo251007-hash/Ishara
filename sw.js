@@ -1,0 +1,5 @@
+const CACHE="ishara-v3-teamupdated";
+const ASSETS=["./","./index.html","./manifest.json","./ishara_icon.png"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim())));
+self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(x=>{if(x.ok&&new URL(e.request.url).origin===location.origin){const c=x.clone();caches.open(CACHE).then(k=>k.put(e.request,c));}return x}).catch(()=>caches.match("./index.html"))))});

@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.ishara.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.ishara.app'
+        minSdk 23
+        targetSdk 35
+        versionCode 29
+        versionName '1.0'
+    }
+
+    // التوقيع بيتقرا من متغيرات البيئة (GitHub Secrets). لو مش موجودة بيستخدم توقيع debug العادي.
+    def ksFile = System.getenv('KEYSTORE_FILE')
+    signingConfigs {
+        ishara {
+            if (ksFile) {
+                storeFile file(ksFile)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        debug { signingConfig ksFile ? signingConfigs.ishara : signingConfigs.debug }
+        release { signingConfig ksFile ? signingConfigs.ishara : signingConfigs.debug }
+    }
+}
